@@ -15,12 +15,10 @@
 const $ = require('jquery');
 
 /**
- * A collapsible navigation panel.
- *
- * Only anchors are currently supported as focusable panel items.
+ * A collapsible navigation panel for web pages.
  */
 class NavigationPanel {
-  constructor(fullwidth = false) {
+  constructor() {
     /**
      * All toggle buttons on the current page.
      */
@@ -56,7 +54,7 @@ class NavigationPanel {
      * If false (default), it will measure the target element's width and
      * transition between that and 0.
      */
-    this.fullwidth = fullwidth;
+    this.fullwidth;
 
     this.keycode = {
       escape: 27,
@@ -92,7 +90,10 @@ class NavigationPanel {
         }
 
         let target = $(this).data('target');
+        let fullwidth = $(this).data('fullwidth');
+
         navPanel.target = $(target);
+        navPanel.fullwidth = fullwidth;
         navPanel.panelItems = navPanel.target.find('a');
         navPanel.button = $(this);
 
