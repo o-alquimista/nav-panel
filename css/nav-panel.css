@@ -1,0 +1,9 @@
+.np-collapsible:not(.np-expanded) {
+  display: none;
+}
+
+.np-transitioning {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
