@@ -52,7 +52,7 @@ Now create the collapsible element (the panel itself).
 
 That's it. Give it a try!
 
-## Custom events
+### Custom events
 To allow you to hook into the plugin's functionality, custom events are fired on certain conditions.
 
 | Event type      | Fired when                                    |
