@@ -157,17 +157,15 @@ class NavigationPanel {
       this.target.width('');
     }
 
-    var button = this.button;
-
-    this.target.one("transitionend", function() {
+    this.target.one("transitionend", () => {
       if (this.verticalTransition) {
-        $(this).removeClass('np-transitioning-height');
+        this.target.removeClass('np-transitioning-height');
       } else {
-        $(this).removeClass('np-transitioning-width');
+        this.target.removeClass('np-transitioning-width');
       }
 
-      $(this).addClass('np-collapsible');
-      button.attr('aria-expanded', false);
+      this.target.addClass('np-collapsible');
+      this.button.attr('aria-expanded', false);
     });
 
     this.removeEphemeralEvents();
@@ -204,18 +202,16 @@ class NavigationPanel {
       this.target.width(targetSize);
     }
 
-    var button = this.button;
-
-    this.target.one("transitionend", function() {
+    this.target.one("transitionend", () => {
       if (this.verticalTransition) {
-        $(this).removeClass('np-transitioning-height');
+        this.target.removeClass('np-transitioning-height');
       } else {
-        $(this).removeClass('np-transitioning-width');
+        this.target.removeClass('np-transitioning-width');
       }
 
-      $(this).addClass('np-collapsible');
-      $(this).addClass('np-expanded');
-      button.attr('aria-expanded', true);
+      this.target.addClass('np-collapsible');
+      this.target.addClass('np-expanded');
+      this.button.attr('aria-expanded', true);
     });
 
     this.addEphemeralEvents();
