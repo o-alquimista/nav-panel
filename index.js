@@ -22,7 +22,7 @@ class NavigationPanel {
     /**
      * All toggle buttons on the current page.
      */
-    this.buttons = $('.collapsible-toggle');
+    this.buttons = $('.np-toggle');
 
     /**
      * The currently selected toggle button.
@@ -48,13 +48,20 @@ class NavigationPanel {
     this.initialized = false;
 
     /**
-     * Fullwidth mode.
+     * Fullscreen mode.
      *
-     * If true, the target element will transition from width 0 to width 100%.
-     * If false (default), it will measure the target element's width and
-     * transition between that and 0.
+     * If true, the target width or height will be set to 100%. If false, that
+     * will be determined from the original dimensions of the target element.
      */
-    this.fullwidth;
+    this.fullscreen;
+
+    /**
+     * Vertical transition mode.
+     *
+     * If true, height will be used for the transitions. If false, width is
+     * used.
+     */
+    this.verticalTransition;
 
     this.keycode = {
       escape: 27,
@@ -90,10 +97,12 @@ class NavigationPanel {
         }
 
         let target = $(this).data('target');
-        let fullwidth = $(this).data('fullwidth');
+        let fullscreen = $(this).data('fullscreen');
+        let verticalTransition = $(this).data('verticalTransition');
 
         navPanel.target = $(target);
-        navPanel.fullwidth = fullwidth;
+        navPanel.fullscreen = fullscreen;
+        navPanel.verticalTransition = verticalTransition;
         navPanel.panelItems = navPanel.target.find('a');
         navPanel.button = $(this);
 
@@ -131,19 +140,32 @@ class NavigationPanel {
     }
 
     // Add the transition effect
-    this.target.addClass('np-transitioning');
+    if (this.verticalTransition) {
+      this.target.addClass('np-transitioning-height');
+    } else {
+      this.target.addClass('np-transitioning-width');
+    }
 
     // Maintain visibility of the item during transition
     this.target.removeClass('np-collapsible');
     this.target.removeClass('np-expanded');
 
-    // Reset the width so the 'np-transitioning' class can set it to zero
-    this.target.width('');
+    // Reset the width or height so the 'np-transitioning' classes can set it to zero
+    if (this.verticalTransition) {
+      this.target.height('');
+    } else {
+      this.target.width('');
+    }
 
     var button = this.button;
 
     this.target.one("transitionend", function() {
-      $(this).removeClass('np-transitioning');
+      if (this.verticalTransition) {
+        $(this).removeClass('np-transitioning-height');
+      } else {
+        $(this).removeClass('np-transitioning-width');
+      }
+
       $(this).addClass('np-collapsible');
       button.attr('aria-expanded', false);
     });
@@ -152,26 +174,45 @@ class NavigationPanel {
   }
 
   show() {
-    var targetWidth;
+    var targetSize;
 
-    if (this.fullwidth) {
-      targetWidth = '100%';
+    if (this.fullscreen) {
+      targetSize = '100%';
     } else {
-      // Get the collapsible element's width in pixels and convert it to rem units
-      targetWidth = this.target.width() / 16 + 'rem';
+      // Get the collapsible element's size in pixels and convert it to rem units
+      if (this.verticalTransition) {
+        targetSize = this.target.height() / 16 + 'rem';
+      } else {
+        targetSize = this.target.width() / 16 + 'rem';
+      }
     }
 
-    // Restore target element visibility and apply transition
+    // Restore target element visibility
     this.target.removeClass('np-collapsible');
-    this.target.addClass('np-transitioning');
 
-    // Set the width to trigger the transition effect
-    this.target.width(targetWidth);
+    // Apply transition
+    if (this.verticalTransition) {
+      this.target.addClass('np-transitioning-height');
+    } else {
+      this.target.addClass('np-transitioning-width');
+    }
+
+    // Set the width or height to trigger the transition effect
+    if (this.verticalTransition) {
+      this.target.height(targetSize);
+    } else {
+      this.target.width(targetSize);
+    }
 
     var button = this.button;
 
     this.target.one("transitionend", function() {
-      $(this).removeClass('np-transitioning');
+      if (this.verticalTransition) {
+        $(this).removeClass('np-transitioning-height');
+      } else {
+        $(this).removeClass('np-transitioning-width');
+      }
+
       $(this).addClass('np-collapsible');
       $(this).addClass('np-expanded');
       button.attr('aria-expanded', true);
@@ -315,7 +356,7 @@ class NavigationPanel {
    * This can be used to prevent glitchy behavior.
    */
   isTransitioning() {
-    if (this.target.hasClass('np-transitioning')) {
+    if (this.target.hasClass('np-transitioning-height') || this.target.hasClass('np-transitioning-width')) {
       return true;
     }
 

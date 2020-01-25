@@ -1,9 +1,11 @@
 # Navigation Panel
 A collapsible navigation panel for web pages.
 
-The mechanism of showing and hiding the panel works similarly to Bootstrap's Collapse component. When showing, the panel is made visible with the `display` CSS property, then it transitions to the target width. When hiding, it transitions to `width: 0`, then it is hidden with the `display` property.
+The mechanism for showing and hiding the panel works similarly to Bootstrap's Collapse component. When showing, the panel is made visible with the `display` CSS property, then it transitions to the target width or height. When hiding, it transitions to width or height `0`, then it is hidden with the `display` property.
 
-Speaking of target width, there are two transition modes: _full width_ and _calculated width_. In full width mode the panel will transition to and from `width: 100%`, while in calculated width mode it will calculate the width of the panel and transition to and from that value. This is configured through the `data-fullwidth` attribute.
+Speaking of transitions, there is a special transition mode: the _fullscreen_ mode. When enabled, the panel will transition to and from `100%`, otherwise it will calculate the original width or height of the panel and transition to and from that value. This is controlled through the `data-fullscreen` attribute.
+
+Transition orientation is configurable through the `data-vertical-transition` attribute. The value of `true` makes it use the height for the transition, while `false` makes it use the width.
 
 This plugin toggles `aria-expanded`, provides keyboard navigation with the arrow keys and performs focus monitoring to close the panel when it is no longer in focus.
 
@@ -33,7 +35,7 @@ We're going to need some CSS for the next steps. They enable the collapsible beh
 
 Create the toggle button.
 ```
-<button class="collapsible-toggle" data-target="#nav-menu" data-fullwidth="false" aria-label="" aria-expanded="false" aria-controls="nav-menu" aria-haspopup="true">
+<button class="np-toggle" data-target="#nav-menu" data-fullscreen="false" data-vertical-transition="false" aria-label="" aria-expanded="false" aria-controls="nav-menu" aria-haspopup="true">
   Menu
 </button>
 ```
@@ -52,6 +54,6 @@ That's it. Give it a try!
 
 ### Tips
 - This plugin does not apply any decorative CSS. Styling these elements is up to you. You'll probably want to manage z-index, set `position: fixed` on the panel and give it a background color, among other things.
-- Feel free to hide the panel and its toggle button on specific viewport breakpoints, if that's what you need. The script will ignore events when it's hidden.
-- By default, the panel will transition from left to right. To get the opposite of this, set `right: 0` on it.
+- Feel free to hide the panel and its toggle button on specific viewport breakpoints, if that's what you need. The script will ignore events when they're hidden.
+- You can change from which edge of the screen the panel will appear to come from by using positioning properties such as `right: 0` and `bottom: 0`.
 - You can make the panel contents scrollable with `overflow-y: auto`.

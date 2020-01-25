@@ -2,8 +2,14 @@
   display: none;
 }
 
-.np-transitioning {
+.np-transitioning-width {
   width: 0;
   overflow: hidden;
   transition: width 0.25s ease;
+}
+
+.np-transitioning-height {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.25s ease;
 }
