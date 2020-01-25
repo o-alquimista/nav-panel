@@ -7,7 +7,7 @@ Speaking of transitions, there is a special transition mode: the _fullscreen_ mo
 
 Transition orientation is configurable through the `data-vertical-transition` attribute. The value of `true` makes it use the height for the transition, while `false` makes it use the width.
 
-This plugin toggles `aria-expanded`, provides keyboard navigation with the arrow keys and performs focus monitoring to close the panel when it is no longer in focus.
+This plugin toggles `aria-expanded`, provides keyboard navigation with the arrow keys and performs focus monitoring to close the panel when it is no longer in focus. Currently, only anchor elements `<a>` are supported as focusable panel items.
 
 ## Installation and Usage
 Install the [npm package](https://www.npmjs.com/package/nav-panel) using your preferred package manager.
@@ -52,7 +52,23 @@ Now create the collapsible element (the panel itself).
 
 That's it. Give it a try!
 
-### Tips
+## Custom events
+To allow you to hook into the plugin's functionality, custom events are fired on certain conditions.
+
+| Event type      | Fired when                                    |
+| --------------- | --------------------------------------------- |
+| `show.navpanel` | The panel is expanded (waits for transition)  |
+| `hide.navpanel` | The panel is collapsed (waits for transition) |
+
+One common use for this is to alternate between 'open' and 'close' icons on the toggle button.
+
+```
+$('#nav-menu').on('show.navpanel', function() {
+  // Do something
+});
+```
+
+### CSS
 - This plugin does not apply any decorative CSS. Styling these elements is up to you. You'll probably want to manage z-index, set `position: fixed` on the panel and give it a background color, among other things.
 - Feel free to hide the panel and its toggle button on specific viewport breakpoints, if that's what you need. The script will ignore events when they're hidden.
 - You can change from which edge of the screen the panel will appear to come from by using positioning properties such as `right: 0` and `bottom: 0`.

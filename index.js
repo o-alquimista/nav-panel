@@ -81,6 +81,12 @@ class NavigationPanel {
       get keydown() {
         return 'keydown' + this.namespace;
       }
+      get hide() {
+        return 'hide' + this.namespace;
+      }
+      get show() {
+        return 'show' + this.namespace;
+      }
     };
   }
 
@@ -166,6 +172,10 @@ class NavigationPanel {
 
       this.target.addClass('np-collapsible');
       this.button.attr('aria-expanded', false);
+
+      // Create and fire custom 'hide' event
+      let hideEvent = $.Event(this.event.hide);
+      this.target.trigger(hideEvent);
     });
 
     this.removeEphemeralEvents();
@@ -212,6 +222,10 @@ class NavigationPanel {
       this.target.addClass('np-collapsible');
       this.target.addClass('np-expanded');
       this.button.attr('aria-expanded', true);
+
+      // Create and fire custom 'show' event
+      let showEvent = $.Event(this.event.show);
+      this.target.trigger(showEvent);
     });
 
     this.addEphemeralEvents();
