@@ -201,11 +201,11 @@ class NavigationPanel {
     if (this.fullscreen) {
       targetSize = '100%';
     } else {
-      // Get the collapsible element's size in pixels and convert it to rem units
+      // Get the collapsible element's size
       if (this.verticalTransition) {
-        targetSize = this.target.height() / 16 + 'rem';
+        targetSize = this.target.height() + 'px';
       } else {
-        targetSize = this.target.width() / 16 + 'rem';
+        targetSize = this.target.width() + 'px';
       }
     }
 
