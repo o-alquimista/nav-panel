@@ -81,6 +81,9 @@ class NavigationPanel {
       get keydown() {
         return 'keydown' + this.namespace;
       },
+      get resize() {
+        return 'resize' + this.namespace;
+      },
       get hide() {
         return 'hide' + this.namespace;
       },
@@ -244,7 +247,7 @@ class NavigationPanel {
       this.hide();
     });
 
-    this.button.add(this.panelItems).keydown((event) => {
+    this.button.add(this.panelItems).on(this.event.keydown, (event) => {
       if (event.which != this.keycode.escape) {
         return;
       }
@@ -259,7 +262,7 @@ class NavigationPanel {
       this.button.focus();
     });
 
-    this.button.keydown((event) => {
+    this.button.on(this.event.keydown, (event) => {
       if (event.which != this.keycode.arrowUp && event.which != this.keycode.arrowDown) {
         return;
       }
@@ -268,7 +271,7 @@ class NavigationPanel {
       this.panelItems.first().focus();
     });
 
-    this.panelItems.keydown((event) => {
+    this.panelItems.on(this.event.keydown, (event) => {
       /*
        * Keyboard navigation through panel items using arrow keys.
        */
@@ -307,7 +310,7 @@ class NavigationPanel {
       }
     });
 
-    this.panelItems.click(function(event) {
+    this.panelItems.on(this.event.click, function(event) {
       event.stopPropagation();
     });
 
@@ -352,12 +355,21 @@ class NavigationPanel {
 
       event.preventDefault();
     });
+
+    $(window).on(this.event.resize, () => {
+      if (this.isTransitioning()) {
+        return;
+      }
+
+      this.hide();
+    });
   }
 
   removeEphemeralEvents() {
     $(document).off(this.event.namespace);
-    this.button.off('keydown');
-    this.panelItems.off('keydown click');
+    $(window).off(this.event.namespace);
+    this.button.off(this.event.namespace);
+    this.panelItems.off(this.event.namespace);
   }
 
   /**
