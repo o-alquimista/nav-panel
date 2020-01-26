@@ -132,10 +132,6 @@ class NavigationPanel {
   }
 
   toggle() {
-    if (this.isTransitioning()) {
-      return;
-    }
-
     if (this.isExpanded()) {
       this.hide();
     } else {
@@ -152,6 +148,10 @@ class NavigationPanel {
      * the page. This prevents that from ever happening.
      */
     if (this.target.is(':hidden')) {
+      return;
+    }
+
+    if (this.isTransitioning()) {
       return;
     }
 
@@ -192,6 +192,10 @@ class NavigationPanel {
   }
 
   show() {
+    if (this.isTransitioning()) {
+      return;
+    }
+
     var targetSize;
 
     if (this.fullscreen) {
@@ -247,19 +251,11 @@ class NavigationPanel {
        * Any clicks that bubble up to the document will cause the panel
        * to collapse.
        */
-      if (this.isTransitioning()) {
-        return;
-      }
-
       this.hide();
     });
 
     this.button.add(this.panelItems).on(this.event.keydown, (event) => {
       if (event.which != this.keycode.escape) {
-        return;
-      }
-
-      if (this.isTransitioning()) {
         return;
       }
 
@@ -332,10 +328,6 @@ class NavigationPanel {
         return;
       }
 
-      if (this.isTransitioning()) {
-        return;
-      }
-
       var focused = $(document.activeElement);
 
       if (focused.is(this.button) || focused.is(this.panelItems) || focused.is(this.target)) {
@@ -365,10 +357,6 @@ class NavigationPanel {
 
     if (this.closeOnResize) {
       $(window).on(this.event.resize, () => {
-        if (this.isTransitioning()) {
-          return;
-        }
-
         this.hide();
       });
     }
