@@ -80,10 +80,10 @@ class NavigationPanel {
       },
       get keydown() {
         return 'keydown' + this.namespace;
-      }
+      },
       get hide() {
         return 'hide' + this.namespace;
-      }
+      },
       get show() {
         return 'show' + this.namespace;
       }
