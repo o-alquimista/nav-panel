@@ -63,6 +63,14 @@ class NavigationPanel {
      */
     this.verticalTransition;
 
+    /**
+     * Close on window resize.
+     *
+     * An optional feature that causes the panel to close when the browser
+     * window is resized.
+     */
+    this.closeOnResize;
+
     this.keycode = {
       escape: 27,
       tab: 9,
@@ -106,12 +114,11 @@ class NavigationPanel {
         }
 
         let target = $(this).data('target');
-        let fullscreen = $(this).data('fullscreen');
-        let verticalTransition = $(this).data('verticalTransition');
 
         navPanel.target = $(target);
-        navPanel.fullscreen = fullscreen;
-        navPanel.verticalTransition = verticalTransition;
+        navPanel.fullscreen = $(this).data('fullscreen');
+        navPanel.verticalTransition = $(this).data('verticalTransition');
+        navPanel.closeOnResize = $(this).data('closeOnResize');
         navPanel.panelItems = navPanel.target.find('a');
         navPanel.button = $(this);
 
@@ -356,20 +363,25 @@ class NavigationPanel {
       event.preventDefault();
     });
 
-    $(window).on(this.event.resize, () => {
-      if (this.isTransitioning()) {
-        return;
-      }
+    if (this.closeOnResize) {
+      $(window).on(this.event.resize, () => {
+        if (this.isTransitioning()) {
+          return;
+        }
 
-      this.hide();
-    });
+        this.hide();
+      });
+    }
   }
 
   removeEphemeralEvents() {
     $(document).off(this.event.namespace);
-    $(window).off(this.event.namespace);
     this.button.off(this.event.namespace);
     this.panelItems.off(this.event.namespace);
+
+    if (this.closeOnResize) {
+      $(window).off(this.event.resize);
+    }
   }
 
   /**

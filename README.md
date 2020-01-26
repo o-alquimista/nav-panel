@@ -7,6 +7,8 @@ Speaking of transitions, there is a special transition mode: the _fullscreen_ mo
 
 Transition orientation is configurable through the `data-vertical-transition` attribute. The value of `true` makes it use the height for the transition, while `false` makes it use the width.
 
+To have your panel close whenever the browser window is resized, set `data-close-on-resize` to true.
+
 This plugin toggles `aria-expanded`, provides keyboard navigation with the arrow keys and performs focus monitoring to close the panel when it is no longer in focus. Currently, only anchor elements `<a>` are supported as focusable panel items.
 
 ## Installation and Usage
@@ -35,7 +37,7 @@ We're going to need some CSS for the next steps. They enable the collapsible beh
 
 Create the toggle button.
 ```
-<button class="np-toggle" data-target="#nav-menu" data-fullscreen="false" data-vertical-transition="false" aria-label="" aria-expanded="false" aria-controls="nav-menu" aria-haspopup="true">
+<button class="np-toggle" data-target="#nav-menu" data-fullscreen="false" data-vertical-transition="false" data-close-on-resize="false" aria-label="" aria-expanded="false" aria-controls="nav-menu" aria-haspopup="true">
   Menu
 </button>
 ```
