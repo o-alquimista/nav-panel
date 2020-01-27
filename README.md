@@ -1,15 +1,20 @@
 # Navigation Panel
 A collapsible navigation panel for web pages.
 
+## How it works
 The mechanism for showing and hiding the panel works similarly to Bootstrap's Collapse component. When showing, the panel is made visible with the `display` CSS property, then it transitions to the target width or height. When hiding, it transitions to width or height `0`, then it is hidden with the `display` property.
 
+### Configurability
 Speaking of transitions, there is a special transition mode: the _fullscreen_ mode. When enabled, the panel will transition to and from `100%`, otherwise it will calculate the original width or height of the panel and transition to and from that value. This is controlled through the `data-fullscreen` attribute.
 
 Transition orientation is configurable through the `data-vertical-transition` attribute. The value of `true` makes it use the height for the transition, while `false` makes it use the width.
 
 To have your panel close whenever the browser window is resized, set `data-close-on-resize` to true.
 
-This plugin toggles `aria-expanded`, provides keyboard navigation with the arrow keys and performs focus monitoring to close the panel when it is no longer in focus. Currently, only anchor elements `<a>` are supported as focusable panel items.
+### Accessibility
+This plugin toggles `aria-expanded`, provides keyboard navigation with the arrow keys, performs focus monitoring to close the panel when it is no longer in focus, plus other keyboard and pointer interactions. The code snippets here include the necessary ARIA attributes. Currently, only anchor elements `<a>` are supported as focusable panel items.
+
+Wanna see it in action? I use it on my [portfolio page](https://dougsilva.me/) and on a [demo project](https://kabum.dougsilva.me/) on smaller viewport sizes.
 
 ## Installation and Usage
 Install the [npm package](https://www.npmjs.com/package/nav-panel) using your preferred package manager.
