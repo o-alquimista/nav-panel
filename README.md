@@ -59,6 +59,13 @@ Now create the collapsible element (the panel itself).
 
 That's it. Give it a try!
 
+### CSS
+This plugin does not apply any decorative CSS. Styling these elements is up to you. You'll probably want to manage `z-index`, set `position: fixed` on the panel and give it a `background-color`, among other things.
+
+- Feel free to hide the panel and its toggle button on specific viewport breakpoints, if that's what you need. The script will ignore events when they're hidden.
+- You can change from which edge of the screen the panel will appear to come from by using positioning properties such as `right: 0` and `bottom: 0`.
+- You can make the panel contents scrollable with `overflow-y: auto`.
+
 ### Custom events
 To allow you to hook into the plugin's functionality, custom events are fired on certain conditions.
 
@@ -76,10 +83,10 @@ $('#nav-menu').on('show.navpanel', function() {
 ```
 
 ### Controlling the panel from external scripts
-You may call `show()`, `hide()` or `toggle()` on the instance of `NavigationPanel` that you created earlier.
+You may call `show()`, `hide()` and `toggle()` on the instance of `NavigationPanel` that you created earlier.
 
-### CSS
-- This plugin does not apply any decorative CSS. Styling these elements is up to you. You'll probably want to manage z-index, set `position: fixed` on the panel and give it a background color, among other things.
-- Feel free to hide the panel and its toggle button on specific viewport breakpoints, if that's what you need. The script will ignore events when they're hidden.
-- You can change from which edge of the screen the panel will appear to come from by using positioning properties such as `right: 0` and `bottom: 0`.
-- You can make the panel contents scrollable with `overflow-y: auto`.
+However, if you intend to have multiple panels and buttons on the same page and use these methods to control them, be aware of these limitations:
+
+- These methods don't yet allow you to choose which button will receive the call. It reuses the data from the last button pressed.
+
+- Normally, when a panel is expanded by pressing its button, any other panels that happen to be expanded will immediately collapse. This _will not_ happen when calling these methods yourself.
