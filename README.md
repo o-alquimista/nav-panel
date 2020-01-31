@@ -75,6 +75,9 @@ $('#nav-menu').on('show.navpanel', function() {
 });
 ```
 
+### Controlling the panel from external scripts
+You may call `show()`, `hide()` or `toggle()` on the instance of `NavigationPanel` that you created earlier.
+
 ### CSS
 - This plugin does not apply any decorative CSS. Styling these elements is up to you. You'll probably want to manage z-index, set `position: fixed` on the panel and give it a background color, among other things.
 - Feel free to hide the panel and its toggle button on specific viewport breakpoints, if that's what you need. The script will ignore events when they're hidden.
