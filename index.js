@@ -12,389 +12,431 @@
  * copies or substantial portions of the Software.
  */
 
-const $ = require('jquery');
-
-/**
- * A collapsible navigation panel for web pages.
- */
 class NavigationPanel {
-  constructor() {
-    /**
-     * All toggle buttons on the current page.
-     */
-    this.buttons = $('.np-toggle');
+    constructor() {
+        /**
+         * All toggle buttons on the current page.
+         */
+        this.buttons = document.querySelectorAll('.np-toggle');
+
+        /**
+         * The currently selected toggle button.
+         */
+        this.button;
+
+        /**
+         * The target collapsible element of the currently selected toggle.
+         */
+        this.target;
+
+        /**
+         * All focusable items within the panel corresponding to the current target.
+         */
+        this.panelItems;
+
+        /**
+         * This boolean indicates whether the navigation panel was ever toggled.
+         *
+         * This is useful to prevent access to properties such as 'button' and
+         * 'target', which are undefined until the first toggle is made.
+         */
+        this.initialized = false;
+
+        /**
+         * Fullscreen mode.
+         *
+         * If true, the target width or height will be set to 100%. If false, that
+         * will be determined from the original dimensions of the target element.
+         */
+        this.fullscreen;
+
+        /**
+         * Vertical transition mode.
+         *
+         * If true, height will be used for the transitions. If false, width is
+         * used.
+         */
+        this.verticalTransition;
+
+        /**
+         * Close on window resize.
+         *
+         * An optional feature that causes the panel to close when the browser
+         * window is resized.
+         */
+        this.closeOnResize;
+
+        this.keycode = {
+            escape: 27,
+            tab: 9,
+            arrowUp: 38,
+            arrowDown: 40
+        };
+
+        this.handler = {
+            buttonClick: undefined,
+            transitionShowEnd: undefined,
+            transitionHideEnd: undefined,
+            documentClick: undefined,
+            escapeKey: undefined,
+            arrowsOnButton: undefined,
+            keyboardNavigation: undefined,
+            panelItemsClick: undefined,
+            documentKeyUp: undefined,
+            documentKeyDown: undefined,
+            windowOnResize: undefined
+        };
+    }
+
+    setup() {
+        this.handler.buttonClick = (event) => {
+            event.stopPropagation();
+
+            // If another navigation panel was left open, this will close it
+            if (this.initialized === true && this.isExpanded()) {
+                this.hide();
+            }
+
+            this.button = document.querySelector(event.target);
+            this.target = document.querySelector(this.button.dataset.target);
+            this.fullscreen = this.button.dataset.fullscreen;
+            this.verticalTransition = this.button.dataset.verticalTransition;
+            this.closeOnResize = this.button.dataset.closeOnResize;
+            this.panelItems = this.target.querySelectorAll('a');
+
+            if (this.initialized === false) {
+                this.initialized = true;
+            }
+
+            this.toggle();
+        }
+
+        this.buttons.forEach(
+            (currentValue, currentIndex, listObj) => {
+                currentValue.addEventListener('click', this.handler.buttonClick, false);
+            }
+        );
+    }
+
+    toggle() {
+        if (this.isExpanded()) {
+            this.hide();
+        } else {
+            this.show();
+        }
+    }
 
     /**
-     * The currently selected toggle button.
+     * Check if the navigation panel is activated/expanded.
      */
-    this.button;
+    isExpanded() {
+        if (this.target.classList.contains('np-expanded')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    show() {
+        if (this.isTransitioning()) {
+            return;
+        }
+
+        var targetSize;
+
+        if (this.fullscreen) {
+            targetSize = '100%';
+        } else {
+            // Get the collapsible element's size
+            if (this.verticalTransition) {
+                targetSize = this.target.offsetHeight + 'px';
+            } else {
+                targetSize = this.target.offsetWidth + 'px';
+            }
+        }
+
+        // Restore target element visibility
+        this.target.classList.remove('np-collapsible');
+
+        // Apply transition
+        if (this.verticalTransition) {
+            this.target.classList.add('np-transitioning-height');
+        } else {
+            this.target.classList.add('np-transitioning-width');
+        }
+
+        // Set the width or height to trigger the transition effect
+        if (this.verticalTransition) {
+            this.target.style.height = targetSize;
+        } else {
+            this.target.style.width = targetSize;
+        }
+
+        this.handler.transitionShowEnd = (event) => {
+            if (this.verticalTransition) {
+                this.target.classList.remove('np-transitioning-height');
+            } else {
+                this.target.classList.remove('np-transitioning-width');
+            }
+
+            this.target.classList.add('np-collapsible');
+            this.target.classList.add('np-expanded');
+            this.button.setAttribute('aria-expanded', true);
+
+            // Create and fire custom 'show' event
+            var showEvent = new Event('show');
+            this.target.dispatchEvent(showEvent);
+        }
+
+        this.target.addEventListener('transitionend', this.handler.transitionShowEnd, {once: true});
+        this.addEphemeralEvents();
+    }
+
+    hide() {
+        /*
+         * The panel may be hidden with CSS at certain viewport sizes. In those
+         * conditions our CSS transition should never fire. If it does, the panel
+         * will be locked in a 'transition' state and it will not work until the
+         * user reloads the page. This prevents that from ever happening.
+         */
+        var visibility = getComputedStyle(this.target).display;
+
+        if (visibility == 'none') {
+            return;
+        }
+
+        if (this.isTransitioning()) {
+            return;
+        }
+
+        // Add the transition effect
+        if (this.verticalTransition) {
+            this.target.classList.add('np-transitioning-height');
+        } else {
+            this.target.classList.add('np-transitioning-width');
+        }
+
+        // Maintain visibility of the item during transition
+        this.target.classList.remove('np-collapsible');
+        this.target.classList.remove('np-expanded');
+
+        // Reset the width or height so the 'np-transitioning' classes can set it to zero
+        if (this.verticalTransition) {
+            this.target.style.height = '';
+        } else {
+            this.target.style.width = '';
+        }
+
+        this.handler.transitionHideEnd = (event) => {
+            if (this.verticalTransition) {
+                this.target.classList.remove('np-transitioning-height');
+            } else {
+                this.target.classList.remove('np-transitioning-width');
+            }
+
+            this.target.classList.add('np-collapsible');
+            this.button.setAttribute('aria-expanded', false);
+
+            // Create and fire custom 'hide' event
+            var hideEvent = new Event('hide');
+            this.target.dispatchEvent(hideEvent);
+        }
+
+        this.target.addEventListener('transitionend', this.handler.transitionHideEnd, {once: true});
+        this.removeEphemeralEvents();
+    }
 
     /**
-     * The target collapsible element of the currently selected toggle.
-     */
-    this.target;
-
-    /**
-     * All focusable items within the panel corresponding to the current target.
-     */
-    this.panelItems;
-
-    /**
-     * This boolean indicates whether the navigation panel was ever toggled.
+     * Detect a CSS transition in progress.
      *
-     * This is useful to prevent access to properties such as 'button' and
-     * 'target', which are undefined until the first toggle is made.
+     * This can be used to prevent glitchy behavior.
      */
-    this.initialized = false;
-
-    /**
-     * Fullscreen mode.
-     *
-     * If true, the target width or height will be set to 100%. If false, that
-     * will be determined from the original dimensions of the target element.
-     */
-    this.fullscreen;
-
-    /**
-     * Vertical transition mode.
-     *
-     * If true, height will be used for the transitions. If false, width is
-     * used.
-     */
-    this.verticalTransition;
-
-    /**
-     * Close on window resize.
-     *
-     * An optional feature that causes the panel to close when the browser
-     * window is resized.
-     */
-    this.closeOnResize;
-
-    this.keycode = {
-      escape: 27,
-      tab: 9,
-      arrowUp: 38,
-      arrowDown: 40
-    };
-
-    this.event = {
-      namespace: '.navpanel',
-      get click() {
-        return 'click' + this.namespace;
-      },
-      get keyup() {
-        return 'keyup' + this.namespace;
-      },
-      get keydown() {
-        return 'keydown' + this.namespace;
-      },
-      get resize() {
-        return 'resize' + this.namespace;
-      },
-      get hide() {
-        return 'hide' + this.namespace;
-      },
-      get show() {
-        return 'show' + this.namespace;
-      }
-    };
-  }
-
-  setup() {
-    var navPanel = this;
-
-    this.buttons.each(function() {
-      $(this).click(function(event) {
-        event.stopPropagation();
-
-        // If another navigation panel was left open, this will close it
-        if (navPanel.initialized === true && navPanel.isExpanded()) {
-          navPanel.hide();
+    isTransitioning() {
+        if (this.target.classList.contains('np-transitioning-height') || this.target.classList.contains('np-transitioning-width')) {
+            return true;
         }
 
-        let target = $(this).data('target');
+        return false;
+    }
 
-        navPanel.target = $(target);
-        navPanel.fullscreen = $(this).data('fullscreen');
-        navPanel.verticalTransition = $(this).data('verticalTransition');
-        navPanel.closeOnResize = $(this).data('closeOnResize');
-        navPanel.panelItems = navPanel.target.find('a');
-        navPanel.button = $(this);
-
-        if (navPanel.initialized === false) {
-          navPanel.initialized = true;
+    addEphemeralEvents() {
+        this.handler.documentClick = (event) => {
+            /*
+             * Any clicks that bubble up to the document will cause the panel
+             * to collapse.
+             */
+            this.hide();
         }
 
-        navPanel.toggle();
-      });
-    });
-  }
+        this.handler.escapeKey = (event) => {
+            if (event.which != this.keycode.escape) {
+                return;
+            }
 
-  toggle() {
-    if (this.isExpanded()) {
-      this.hide();
-    } else {
-      this.show();
-    }
-  }
+            this.hide();
 
-  hide() {
-    /*
-     * The panel may be hidden via CSS at certain viewport sizes. In those
-     * situations, our CSS transition will never fire. If the event listener
-     * for 'transitionend' below is never executed, the panel will be locked
-     * in a 'transition' state and it will not work until the user reloads
-     * the page. This prevents that from ever happening.
-     */
-    if (this.target.is(':hidden')) {
-      return;
-    }
-
-    if (this.isTransitioning()) {
-      return;
-    }
-
-    // Add the transition effect
-    if (this.verticalTransition) {
-      this.target.addClass('np-transitioning-height');
-    } else {
-      this.target.addClass('np-transitioning-width');
-    }
-
-    // Maintain visibility of the item during transition
-    this.target.removeClass('np-collapsible');
-    this.target.removeClass('np-expanded');
-
-    // Reset the width or height so the 'np-transitioning' classes can set it to zero
-    if (this.verticalTransition) {
-      this.target.height('');
-    } else {
-      this.target.width('');
-    }
-
-    this.target.one("transitionend", () => {
-      if (this.verticalTransition) {
-        this.target.removeClass('np-transitioning-height');
-      } else {
-        this.target.removeClass('np-transitioning-width');
-      }
-
-      this.target.addClass('np-collapsible');
-      this.button.attr('aria-expanded', false);
-
-      // Create and fire custom 'hide' event
-      let hideEvent = $.Event(this.event.hide);
-      this.target.trigger(hideEvent);
-    });
-
-    this.removeEphemeralEvents();
-  }
-
-  show() {
-    if (this.isTransitioning()) {
-      return;
-    }
-
-    var targetSize;
-
-    if (this.fullscreen) {
-      targetSize = '100%';
-    } else {
-      // Get the collapsible element's size
-      if (this.verticalTransition) {
-        targetSize = this.target.height() + 'px';
-      } else {
-        targetSize = this.target.width() + 'px';
-      }
-    }
-
-    // Restore target element visibility
-    this.target.removeClass('np-collapsible');
-
-    // Apply transition
-    if (this.verticalTransition) {
-      this.target.addClass('np-transitioning-height');
-    } else {
-      this.target.addClass('np-transitioning-width');
-    }
-
-    // Set the width or height to trigger the transition effect
-    if (this.verticalTransition) {
-      this.target.height(targetSize);
-    } else {
-      this.target.width(targetSize);
-    }
-
-    this.target.one("transitionend", () => {
-      if (this.verticalTransition) {
-        this.target.removeClass('np-transitioning-height');
-      } else {
-        this.target.removeClass('np-transitioning-width');
-      }
-
-      this.target.addClass('np-collapsible');
-      this.target.addClass('np-expanded');
-      this.button.attr('aria-expanded', true);
-
-      // Create and fire custom 'show' event
-      let showEvent = $.Event(this.event.show);
-      this.target.trigger(showEvent);
-    });
-
-    this.addEphemeralEvents();
-  }
-
-  addEphemeralEvents() {
-    $(document).on(this.event.click, () => {
-      /*
-       * Any clicks that bubble up to the document will cause the panel
-       * to collapse.
-       */
-      this.hide();
-    });
-
-    this.button.add(this.panelItems).on(this.event.keydown, (event) => {
-      if (event.which != this.keycode.escape) {
-        return;
-      }
-
-      this.hide();
-
-      // Return focus to the button when the panel collapses
-      this.button.focus();
-    });
-
-    this.button.on(this.event.keydown, (event) => {
-      if (event.which != this.keycode.arrowUp && event.which != this.keycode.arrowDown) {
-        return;
-      }
-
-      event.preventDefault();
-      this.panelItems.first().focus();
-    });
-
-    this.panelItems.on(this.event.keydown, (event) => {
-      /*
-       * Keyboard navigation through panel items using arrow keys.
-       */
-      var index;
-      var navPanel = this;
-
-      this.panelItems.each(function() {
-        var item = $(this);
-
-        // Determine index of currently focused item
-        if (item.is(document.activeElement)) {
-          index = navPanel.panelItems.index(item);
-        }
-      });
-
-      if (event.which == this.keycode.arrowUp) {
-        event.preventDefault();
-
-        if (index === 0) {
-          return;
+            // Return focus to the button when the panel collapses
+            this.button.focus();
         }
 
-        index--;
-        this.panelItems.eq(index).focus();
-      }
+        this.handler.arrowsOnButton = (event) => {
+            if (event.which != this.keycode.arrowUp && event.which != this.keycode.arrowDown) {
+                return;
+            }
 
-      if (event.which == this.keycode.arrowDown) {
-        event.preventDefault();
+            event.preventDefault();
 
-        if (index === this.panelItems.length) {
-          return;
+            // Focus on the first panel item
+            this.panelItems.item(0).focus();
         }
 
-        index++;
-        this.panelItems.eq(index).focus();
-      }
-    });
+        this.handler.keyboardNavigation = (event) => {
+            /*
+             * Keyboard navigation through panel items using arrow keys.
+             */
+            var index;
 
-    this.panelItems.on(this.event.click, function(event) {
-      event.stopPropagation();
-    });
+            // Determine index of currently focused item
+            this.panelItems.forEach(
+                (currentValue, currentIndex, listObj) => {
+                    if (currentValue == document.activeElement) {
+                        index = currentIndex;
+                    }
+                }
+            );
 
-    $(document).on(this.event.keyup, (event) => {
-      /*
-       * TAB key events.
-       *
-       * This is responsible for collapsing the panel when keyboard focus
-       * leaves any of the navigation panel elements.
-       */
-      if (event.which != this.keycode.tab) {
-        return;
-      }
+            if (event.which == this.keycode.arrowUp) {
+                event.preventDefault();
 
-      var focused = $(document.activeElement);
+                if (index == 0) {
+                    return;
+                }
 
-      if (focused.is(this.button) || focused.is(this.panelItems) || focused.is(this.target)) {
-        return;
-      }
+                index--;
+                this.panelItems.item(index).focus();
+            }
 
-      this.hide();
-    });
+            if (event.which == this.keycode.arrowDown) {
+                event.preventDefault();
 
-    $(document).on(this.event.keydown, (event) => {
-      /*
-       * TAB key events that prevent the default action during a transition.
-       *
-       * Since a 'keyup' event is too late for preventDefault() to make any
-       * difference, this handler should be bound to a keydown listener.
-       */
-      if (event.which != this.keycode.tab) {
-        return;
-      }
+                if (index == this.panelItems.length) {
+                    return;
+                }
 
-      if (!this.isTransitioning()) {
-        return;
-      }
+                index++;
+                this.panelItems.item(index).focus();
+            }
+        }
 
-      event.preventDefault();
-    });
+        this.handler.panelItemsClick = (event) => {
+            event.stopPropagation();
+        }
 
-    if (this.closeOnResize) {
-      $(window).on(this.event.resize, () => {
-        this.hide();
-      });
+        this.handler.documentKeyUp = (event) => {
+            /*
+             * TAB key events.
+             *
+             * This is responsible for collapsing the panel when keyboard focus
+             * leaves any of the navigation panel elements.
+             */
+            if (event.which != this.keycode.tab) {
+                return;
+            }
+
+            if (document.activeElement == this.button || document.activeElement == this.target) {
+                return;
+            }
+
+            var isPanelItemFocused = false;
+
+            this.panelItems.forEach(
+                (currentValue, currentIndex, listObj) => {
+                    if (currentValue == document.activeElement) {
+                        isPanelItemFocused = true;
+                    }
+                }
+            );
+
+            if (isPanelItemFocused === true) {
+                return;
+            }
+
+            this.hide();
+        }
+
+        this.handler.documentKeyDown = (event) => {
+            /*
+             * TAB key events that prevent the default action during a transition.
+             *
+             * Since a 'keyup' event is too late for preventDefault() to make any
+             * difference, this handler should be bound to a keydown listener.
+             */
+            if (event.which != this.keycode.tab) {
+                return;
+            }
+
+            if (!this.isTransitioning()) {
+                return;
+            }
+
+            event.preventDefault();
+        }
+
+        this.handler.windowOnResize = (event) => {
+            this.hide();
+        }
+
+        document.addEventListener('click', this.handler.documentClick, false);
+        this.button.addEventListener('keydown', this.handler.escapeKey, false);
+        this.panelItems.forEach(
+            (currentValue, currentIndex, listObj) => {
+                currentValue.addEventListener('keydown', this.handler.escapeKey, false);
+            }
+        );
+        this.button.addEventListener('keydown', this.handler.arrowsOnButton, false);
+        this.panelItems.forEach(
+            (currentValue, currentIndex, listObj) => {
+                currentValue.addEventListener('keydown', this.handler.keyboardNavigation, false);
+            }
+        );
+        this.panelItems.forEach(
+            (currentValue, currentIndex, listObj) => {
+                currentValue.addEventListener('click', this.handler.panelItemsClick, false);
+            }
+        );
+        document.addEventListener('keyup', this.handler.documentKeyUp, false);
+        document.addEventListener('keydown', this.handler.documentKeyDown, false);
+        if (this.closeOnResize) {
+            window.addEventListener('resize', this.handler.windowOnResize, false);
+        }
     }
-  }
 
-  removeEphemeralEvents() {
-    $(document).off(this.event.namespace);
-    this.button.off(this.event.namespace);
-    this.panelItems.off(this.event.namespace);
-
-    if (this.closeOnResize) {
-      $(window).off(this.event.resize);
+    removeEphemeralEvents() {
+        document.removeEventListener('click', this.handler.documentClick);
+        this.button.removeEventListener('keydown', this.handler.escapeKey);
+        this.panelItems.forEach(
+            (currentValue, currentIndex, listObj) => {
+                currentValue.removeEventListener('keydown', this.handler.escapeKey);
+            }
+        );
+        this.button.removeEventListener('keydown', this.handler.arrowsOnButton);
+        this.panelItems.forEach(
+            (currentValue, currentIndex, listObj) => {
+                currentValue.removeEventListener('keydown', this.handler.keyboardNavigation);
+            }
+        );
+        this.panelItems.forEach(
+            (currentValue, currentIndex, listObj) => {
+                currentValue.removeEventListener('click', this.handler.panelItemsClick);
+            }
+        );
+        document.removeEventListener('keyup', this.handler.documentKeyUp);
+        document.removeEventListener('keydown', this.handler.documentKeyDown);
+        if (this.closeOnResize) {
+            window.removeEventListener('resize', this.handler.windowOnResize);
+        }
     }
-  }
-
-  /**
-   * Detect a CSS transition in progress.
-   *
-   * This can be used to prevent glitchy behavior.
-   */
-  isTransitioning() {
-    if (this.target.hasClass('np-transitioning-height') || this.target.hasClass('np-transitioning-width')) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Check if the navigation panel is activated/expanded.
-   */
-  isExpanded() {
-    if (this.target.hasClass('np-expanded')) {
-      return true;
-    }
-
-    return false;
-  }
 }
 
 module.exports = NavigationPanel;
+
