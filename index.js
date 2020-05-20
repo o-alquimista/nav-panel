@@ -89,26 +89,28 @@ class NavigationPanel {
     }
 
     setup() {
-        this.handler.buttonClick = (event) => {
+        var _this = this;
+
+        this.handler.buttonClick = function(event) {
             event.stopPropagation();
 
             // If another navigation panel was left open, this will close it
-            if (this.initialized === true && this.isExpanded()) {
-                this.hide();
+            if (_this.initialized === true && _this.isExpanded()) {
+                _this.hide();
             }
 
-            this.button = document.querySelector(event.target);
-            this.target = document.querySelector(this.button.dataset.target);
-            this.fullscreen = this.button.dataset.fullscreen;
-            this.verticalTransition = this.button.dataset.verticalTransition;
-            this.closeOnResize = this.button.dataset.closeOnResize;
-            this.panelItems = this.target.querySelectorAll('a');
+            _this.button = this;
+            _this.target = document.querySelector(_this.button.dataset.target);
+            _this.fullscreen = _this.button.dataset.fullscreen;
+            _this.verticalTransition = _this.button.dataset.verticalTransition;
+            _this.closeOnResize = _this.button.dataset.closeOnResize;
+            _this.panelItems = _this.target.querySelectorAll('a');
 
-            if (this.initialized === false) {
-                this.initialized = true;
+            if (_this.initialized === false) {
+                _this.initialized = true;
             }
 
-            this.toggle();
+            _this.toggle();
         }
 
         this.buttons.forEach(
@@ -142,38 +144,38 @@ class NavigationPanel {
             return;
         }
 
+        // Restore target element visibility
+        this.target.classList.remove('np-collapsible');
+
         var targetSize;
 
-        if (this.fullscreen) {
+        if (this.fullscreen == 'true') {
             targetSize = '100%';
         } else {
             // Get the collapsible element's size
-            if (this.verticalTransition) {
+            if (this.verticalTransition == 'true') {
                 targetSize = this.target.offsetHeight + 'px';
             } else {
                 targetSize = this.target.offsetWidth + 'px';
             }
         }
 
-        // Restore target element visibility
-        this.target.classList.remove('np-collapsible');
-
         // Apply transition
-        if (this.verticalTransition) {
+        if (this.verticalTransition == 'true') {
             this.target.classList.add('np-transitioning-height');
         } else {
             this.target.classList.add('np-transitioning-width');
         }
 
         // Set the width or height to trigger the transition effect
-        if (this.verticalTransition) {
+        if (this.verticalTransition == 'true') {
             this.target.style.height = targetSize;
         } else {
             this.target.style.width = targetSize;
         }
 
         this.handler.transitionShowEnd = (event) => {
-            if (this.verticalTransition) {
+            if (this.verticalTransition == 'true') {
                 this.target.classList.remove('np-transitioning-height');
             } else {
                 this.target.classList.remove('np-transitioning-width');
