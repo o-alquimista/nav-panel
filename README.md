@@ -62,7 +62,7 @@ That's it. Give it a try!
 ### CSS
 This plugin does not apply any decorative CSS. Styling these elements is up to you. You'll probably want to manage `z-index`, set `position: fixed` on the panel and give it a `background-color`, among other things.
 
-- Feel free to hide the panel and its toggle button on specific viewport breakpoints, if that's what you need. The script will ignore events when they're hidden.
+- Feel free to hide the panel and its toggle button with `display: none` on specific viewport breakpoints, if that's what you need. The script will ignore events when they're hidden.
 - You can change from which edge of the screen the panel will appear to come from by using positioning properties such as `right: 0` and `bottom: 0`.
 - You can make the panel contents scrollable with `overflow-y: auto`.
 
