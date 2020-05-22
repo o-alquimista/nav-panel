@@ -24,24 +24,24 @@ yarn add nav-panel
 ```
 
 Then import the module.
-```
+```js
 const NavigationPanel = require('nav-panel');
 ```
 
 Now create an instance of `NavigationPanel` and run `setup()` to initialize it.
-```
+```js
 var navPanel = new NavigationPanel();
 navPanel.setup();
 ```
 
 ### Creating the elements
 We're going to need some CSS for the next steps. They enable the collapsible behavior and the transitioning effect.
-```
+```css
 @import "~nav-panel/css/nav-panel.css";
 ```
 
 Create the toggle button.
-```
+```html
 <button class="np-toggle" data-target="#nav-menu" data-fullscreen="false" data-vertical-transition="false" data-close-on-resize="false" aria-label="" aria-expanded="false" aria-controls="nav-menu" aria-haspopup="true">
   Menu
 </button>
@@ -49,7 +49,7 @@ Create the toggle button.
 Make sure `data-target` points to the collapsible panel we'll create next. To meet accessibility requirements, you should also set `aria-label` and `aria-controls` accordingly. We're using the `nav-menu` id attribute for this example.
 
 Now create the collapsible element (the panel itself).
-```
+```html
 <nav id="nav-menu" class="np-collapsible">
   <a href="#">Home</a>
   <a href="#">About</a>
