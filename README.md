@@ -66,8 +66,8 @@ This plugin does not apply any decorative CSS. Styling these elements is up to y
 - You can change from which edge of the screen the panel will appear to come from by using positioning properties such as `right: 0` and `bottom: 0`.
 - You can make the panel contents scrollable with `overflow-y: auto`.
 
-### Custom events
-To allow you to hook into the plugin's functionality, custom events are fired on certain conditions.
+### Synthetic events
+To allow you to hook into the plugin's functionality, synthetic events are fired on certain conditions.
 
 | Event type      | Fired when                                    |
 | --------------- | --------------------------------------------- |
