@@ -1,6 +1,6 @@
 {
   "name": "nav-panel",
-  "version": "1.0.14",
+  "version": "2.0.0",
   "description": "A collapsible navigation panel for web pages",
   "main": "index.js",
   "scripts": {
