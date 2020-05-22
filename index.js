@@ -144,15 +144,14 @@ class NavigationPanel {
             return;
         }
 
-        // Restore target element visibility
-        this.target.classList.remove('np-collapsible');
+        this.target.classList.add('np-expanded');
 
         var targetSize;
 
         if (this.fullscreen == 'true') {
             targetSize = '100%';
         } else {
-            // Get the collapsible element's size
+            // Get the target element's size
             if (this.verticalTransition == 'true') {
                 targetSize = this.target.offsetHeight + 'px';
             } else {
@@ -160,14 +159,17 @@ class NavigationPanel {
             }
         }
 
-        // Apply transition
+        // Enable the transition and set height to 0
         if (this.verticalTransition == 'true') {
             this.target.classList.add('np-transitioning-height');
         } else {
             this.target.classList.add('np-transitioning-width');
         }
 
-        // Set the width or height to trigger the transition effect
+        // Force a reflow
+        this.target.offsetHeight;
+
+        // Set the target width or height to trigger the transition effect
         if (this.verticalTransition == 'true') {
             this.target.style.height = targetSize;
         } else {
@@ -181,12 +183,10 @@ class NavigationPanel {
                 this.target.classList.remove('np-transitioning-width');
             }
 
-            this.target.classList.add('np-collapsible');
-            this.target.classList.add('np-expanded');
             this.button.setAttribute('aria-expanded', true);
 
             // Create and fire custom 'show' event
-            var showEvent = new Event('show');
+            var showEvent = new Event('np-show');
             this.target.dispatchEvent(showEvent);
         }
 
@@ -212,35 +212,31 @@ class NavigationPanel {
         }
 
         // Add the transition effect
-        if (this.verticalTransition) {
+        if (this.verticalTransition == 'true') {
             this.target.classList.add('np-transitioning-height');
         } else {
             this.target.classList.add('np-transitioning-width');
         }
 
-        // Maintain visibility of the item during transition
-        this.target.classList.remove('np-collapsible');
-        this.target.classList.remove('np-expanded');
-
-        // Reset the width or height so the 'np-transitioning' classes can set it to zero
-        if (this.verticalTransition) {
+        // Remove inline styles so the 'np-transitioning' classes can trigger a transition to 0
+        if (this.verticalTransition == 'true') {
             this.target.style.height = '';
         } else {
             this.target.style.width = '';
         }
 
         this.handler.transitionHideEnd = (event) => {
-            if (this.verticalTransition) {
+            if (this.verticalTransition == 'true') {
                 this.target.classList.remove('np-transitioning-height');
             } else {
                 this.target.classList.remove('np-transitioning-width');
             }
 
-            this.target.classList.add('np-collapsible');
+            this.target.classList.remove('np-expanded');
             this.button.setAttribute('aria-expanded', false);
 
             // Create and fire custom 'hide' event
-            var hideEvent = new Event('hide');
+            var hideEvent = new Event('np-hide');
             this.target.dispatchEvent(hideEvent);
         }
 
@@ -321,7 +317,10 @@ class NavigationPanel {
             if (event.which == this.keycode.arrowDown) {
                 event.preventDefault();
 
-                if (index == this.panelItems.length) {
+                // Subtract 1 to get the last index
+                let lastIndex = this.panelItems.length - 1;
+
+                if (index == lastIndex) {
                     return;
                 }
 
@@ -368,7 +367,7 @@ class NavigationPanel {
 
         this.handler.documentKeyDown = (event) => {
             /*
-             * TAB key events that prevent the default action during a transition.
+             * Ignore TAB key events during a transition.
              *
              * Since a 'keyup' event is too late for preventDefault() to make any
              * difference, this handler should be bound to a keydown listener.
