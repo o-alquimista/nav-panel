@@ -71,15 +71,17 @@ To allow you to hook into the plugin's functionality, custom events are fired on
 
 | Event type      | Fired when                                    |
 | --------------- | --------------------------------------------- |
-| `show.navpanel` | The panel is expanded (waits for transition)  |
-| `hide.navpanel` | The panel is collapsed (waits for transition) |
+| `np-show`       | The panel is expanded (waits for transition)  |
+| `np-hide`       | The panel is collapsed (waits for transition) |
 
 One common use for this is to alternate between 'open' and 'close' icons on the toggle button.
 
-```
-$('#nav-menu').on('show.navpanel', function() {
+```js
+var navMenu = document.querySelector('#nav-menu');
+
+navMenu.addEventListener('np-show', function(event) {
   // Do something
-});
+}, false);
 ```
 
 ### Controlling the panel from external scripts
