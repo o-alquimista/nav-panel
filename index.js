@@ -407,7 +407,7 @@ class NavigationPanel {
         );
         document.addEventListener('keyup', this.handler.documentKeyUp, false);
         document.addEventListener('keydown', this.handler.documentKeyDown, false);
-        if (this.closeOnResize) {
+        if (this.closeOnResize == 'true') {
             window.addEventListener('resize', this.handler.windowOnResize, false);
         }
     }
@@ -433,7 +433,7 @@ class NavigationPanel {
         );
         document.removeEventListener('keyup', this.handler.documentKeyUp);
         document.removeEventListener('keydown', this.handler.documentKeyDown);
-        if (this.closeOnResize) {
+        if (this.closeOnResize == 'true') {
             window.removeEventListener('resize', this.handler.windowOnResize);
         }
     }
