@@ -85,14 +85,15 @@ NavigationPanel.prototype.show = function() {
 
 NavigationPanel.prototype.hide = function() {
     /*
-     * The panel can be hidden with CSS at certain viewport sizes. Under that
+     * Both the panel and the button can be hidden with CSS at certain viewport sizes. Under that
      * condition our CSS transition should never fire. If it does, the panel
      * will be locked forever in a 'transition' state and it will not work until
      * the user reloads the page. This prevents that from ever happening.
      */
-    var visibility = getComputedStyle(this.panel).display;
+    var panelVisibility = getComputedStyle(this.panel).display;
+    var buttonVisibility = getComputedStyle(this.button).display;
 
-    if (visibility == 'none') {
+    if (panelVisibility === 'none' || buttonVisibility === 'none') {
         return false;
     }
 

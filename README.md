@@ -31,9 +31,9 @@ const NavigationPanel = require('nav-panel');
 Now create an instance of `NavigationPanel` and configure it. The first argument is the selector for the toggle button that we will create.
 ```js
 var navPanel = new NavigationPanel('.np-toggle', {
-    fullscreen: true,
-    verticalTransition: false,
-    closeOnResize: false
+    fullscreen: false,
+    verticalTransition: true,
+    closeOnResize: true
 });
 ```
 
@@ -82,8 +82,8 @@ One common use for this is to alternate between 'open' and 'close' icons on the 
 ```js
 document.querySelector('#nav-menu').addEventListener('np-show', function(event) {
   // Do something
-}, false);
+});
 ```
 
 ### Controlling the panel from external scripts
-You may call `show()`, `hide()` and `toggle()` on any instance of `NavigationPanel`.
+You may call `show()`, `hide()`, `toggle()` and `isTransitioning()` on any instance of `NavigationPanel`.
