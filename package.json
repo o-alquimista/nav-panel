@@ -2,10 +2,7 @@
   "name": "nav-panel",
   "version": "3.0.1",
   "description": "A collapsible navigation panel for web pages",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "NavigationPanel.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/o-alquimista/nav-panel.git"

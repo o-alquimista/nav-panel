@@ -14,8 +14,6 @@ To have your panel close whenever the browser window is resized, enable the opti
 ### Accessibility
 This plugin toggles `aria-expanded`, provides keyboard navigation with the arrow keys, performs focus monitoring to close the panel when it is no longer in focus, plus other keyboard and pointer interactions. The code snippets here include the necessary ARIA attributes. Currently, only anchor elements `<a>` are supported as focusable panel items.
 
-Wanna see it in action? I use it on my [portfolio page](https://dougsilva.me/) and on a [demo project](https://kabum.dougsilva.me/) on smaller viewport sizes.
-
 ## Installation and Usage
 Install the [npm package](https://www.npmjs.com/package/nav-panel) using your preferred package manager.
 ```
@@ -87,3 +85,4 @@ document.querySelector('#nav-menu').addEventListener('np-show', function(event) 
 
 ### Controlling the panel from external scripts
 You may call `show()`, `hide()`, `toggle()` and `isTransitioning()` on any instance of `NavigationPanel`.
+
